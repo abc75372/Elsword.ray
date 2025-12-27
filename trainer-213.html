@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>R213族譜訓練器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 20px;
+    }
+    #imageBox {
+      font-size: 80px;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #333;
+      opacity: 1;
+    }
+    #controls {
+      display: none;
+    }
+    input {
+      font-size: 18px;
+      padding: 5px;
+      width: 300px;
+    }
+    textarea {
+      font-size: 14px;
+      padding: 8px;
+      width: 320px;
+      resize: vertical;
+    }
+    #notes {
+      margin-top: 10px;
+    }
+    #timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #b00000;
+      display: none;
+    }
+    #restartBtn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      font-size: 16px;
+    }
+    #commitBtn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>大腦記憶復健遊戲 - 族譜版（R213）</h2>
+  <div id="imageBox"><img id="symbolImg" src="" alt="" style="max-width:100%;max-height:100%;display:none;"></div>
+
+  <div id="notes">
+    <p>筆記區</p>
+    <textarea id="noteArea" placeholder="在這裡做筆記..." rows="5"></textarea>
+  </div>
+
+  <div id="timer">剩餘時間：10 秒</div>
+
+  <div id="controls">
+    <p>請輸入剛剛出現的順序（例如：+ o * x y）</p>
+    <input type="text" id="answer" placeholder="以空白分隔" />
+    <button id="commitBtn" onclick="checkAnswer()">送出</button>
+    <button id="restartBtn" onclick="restartGame()">重來</button>
+  </div>
+
+  <script>
+    // 每個 key 對應一張圖片（請把圖片放在 images 資料夾）
+    const symbols = ['+', 'o', '*', 'x', 'y'];
+    const imageMap = {
+      '+': 'images/plus.png',
+      'o': 'images/o.png',
+      '*': 'images/star.png',
+      'x': 'images/x.png',
+      'y': 'images/y.png'
+    };
+    let sequence = [];
+    let index = 0;
+    let countdownTimer = null;
+    let remainingTime = 10;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      sequence = shuffle([...symbols]);
+      index = 0;
+      document.getElementById('imageBox').style.display = 'flex';
+      document.getElementById('controls').style.display = 'none';
+      document.getElementById('timer').style.display = 'none';
+      showNext();
+    }
+
+    function showNext() {
+      const box = document.getElementById('imageBox');
+      const img = document.getElementById('symbolImg');
+
+      if (index < sequence.length) {
+         box.style.transition = 'none';
+        box.style.opacity = 1;
+        img.src = imageMap[sequence[index]];
+        img.style.display = 'block';
+        
+        setTimeout(() => {
+          box.style.transition = 'opacity 2s linear';
+          box.style.opacity = 0;
+        }, 1000);
+
+        index++;
+        setTimeout(showNext, 3500);
+      } else {
+        box.style.display = 'none';
+        img.style.display = 'none';
+        document.getElementById('controls').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+        startCountdown();
+      }
+    }
+
+    function startCountdown() {
+      remainingTime = 10;
+      document.getElementById('timer').textContent = `剩餘時間：${remainingTime} 秒`;
+
+      countdownTimer = setInterval(() => {
+        remainingTime--;
+        document.getElementById('timer').textContent = `剩餘時間：${remainingTime} 秒`;
+        if (remainingTime <= 0) {
+          clearInterval(countdownTimer);
+          alert('失敗：超過 10 秒');
+          location.reload();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer() {
+      clearInterval(countdownTimer);
+      const input = document.getElementById('answer').value
+        .trim()
+        .toLowerCase()
+        .split(/\s+/);
+
+      if (input.length !== 5) {
+        alert('失敗：數量不正確');
+        return;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (input[i] !== sequence[i].toLowerCase()) {
+          alert('失敗：順序錯誤');
+          return;
+        }
+      }
+
+      alert('成功！');
+      location.reload();
+    }
+
+    function restartGame() {
+      clearInterval(countdownTimer);
+      location.reload();
+    }
+
+    startGame();
+  </script>
+
+</body>
+</html>
