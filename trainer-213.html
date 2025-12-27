@@ -61,6 +61,8 @@
 <body>
 
   <h2>大腦記憶復健遊戲 - 族譜版（R213）</h2>
+
+  <button id="startBtn" onclick="startGame()" style="padding:10px 20px; font-size:18px;">開始</button>
   <div id="imageBox"><img id="symbolImg" src="" alt="" style="max-width:100%;max-height:100%;display:none;"></div>
 
   <div id="notes">
@@ -97,9 +99,14 @@
     }
 
     function startGame() {
+      // 隱藏開始按鈕
+      document.getElementById('startBtn').style.display = 'none';
+
+
       sequence = shuffle([...symbols]);
       index = 0;
       document.getElementById('imageBox').style.display = 'flex';
+      document.getElementById('notes').style.display = 'block';
       document.getElementById('controls').style.display = 'none';
       document.getElementById('timer').style.display = 'none';
       showNext();
@@ -155,13 +162,13 @@
 
       if (input.length !== 5) {
         alert('失敗：數量不正確');
-        return;
+        return restartGame();
       }
 
       for (let i = 0; i < 5; i++) {
         if (input[i] !== sequence[i].toLowerCase()) {
           alert('失敗：順序錯誤');
-          return;
+          return restartGame();
         }
       }
 
@@ -174,7 +181,6 @@
       location.reload();
     }
 
-    startGame();
   </script>
 
 </body>
