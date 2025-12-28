@@ -24,7 +24,7 @@
       opacity: 1;
     }
     #controls {
-      display: none;
+      display: block;
     }
     input {
       font-size: 18px;
@@ -89,6 +89,7 @@
       'x': 'images/x.png',
       'y': 'images/y.png'
     };
+    const preloadedImages = {};
     let sequence = [];
     let index = 0;
     let countdownTimer = null;
@@ -98,28 +99,39 @@
       return array.sort(() => Math.random() - 0.5);
     }
 
+    function preloadImages() {
+      Object.entries(imageMap).forEach(([key, src]) => {
+        const img = new Image();
+        img.src = src;
+        preloadedImages[key] = img;
+      });
+    }
+
     function startGame() {
       // 隱藏開始按鈕
       document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('answer').value = '';
 
 
       sequence = shuffle([...symbols]);
       index = 0;
       document.getElementById('imageBox').style.display = 'flex';
       document.getElementById('notes').style.display = 'block';
-      document.getElementById('controls').style.display = 'none';
+      document.getElementById('controls').style.display = 'block';
       document.getElementById('timer').style.display = 'none';
       showNext();
     }
 
     function showNext() {
       const box = document.getElementById('imageBox');
+      box.style.transition = 'none';
+      box.style.opacity = 1;  
       const img = document.getElementById('symbolImg');
 
       if (index < sequence.length) {
-         box.style.transition = 'none';
+        box.style.transition = 'none';
         box.style.opacity = 1;
-        img.src = imageMap[sequence[index]];
+        img.src = preloadedImages[sequence[index]].src;
         img.style.display = 'block';
         
         setTimeout(() => {
@@ -180,6 +192,7 @@
       clearInterval(countdownTimer);
       location.reload();
     }
+    preloadImages();
 
   </script>
 
